@@ -3,247 +3,815 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portfólio | Arquitetura</title>
+  <title>Brida Monte | Portfólio</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20fill='%2316181B'/%3E%3Ctext%20x='32'%20y='42'%20font-family='Georgia,%20Times%20New%20Roman,%20serif'%20font-style='italic'%20font-weight='600'%20font-size='30'%20fill='%23F5F3EE'%20text-anchor='middle'%3EBM%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
   <style>
     /* =========================================
-       1. VARIÁVEIS E BASE
+       1. TOKENS DE DESIGN
        ========================================= */
     :root {
-      --bg: #FAFAFA;
-      --bg-alt: #EFEFEF;
-      --text-main: #111;
-      --text-muted: #666;
-      --accent: #ddd;
-      --header-h: 70px;
+      /* Paleta: papel técnico + grafite + azul de anteprojeto (assinatura) */
+      --paper:        #F5F3EE;
+      --paper-alt:     #EBE8E0;
+      --ink:           #16181B;
+      --ink-soft:      #5B5F63;
+      --accent:     #2B2D31;
+      --ink-deep:  #141517;
+      --line:          #D8D4C9;
+      --line-strong:   #B7B2A3;
+
+      --font-display: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+      --font-name: 'Playfair Display', 'Times New Roman', serif;
+      --font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+      --header-h: 72px;
+
+      --fs-hero: clamp(2.5rem, 1.4rem + 5vw, 5.5rem);
+      --fs-h2:   clamp(1.6rem, 1.2rem + 1.8vw, 2.4rem);
+      --fs-body: clamp(1rem, 0.95rem + 0.25vw, 1.15rem);
+
+      --section-pad-y: clamp(4rem, 2.5rem + 6vw, 7.5rem);
+      --section-pad-x: clamp(1.25rem, 0.5rem + 4vw, 6%);
+      --gap-grid: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica Neue', 'Inter', sans-serif; }
-    
-    html { 
-      scroll-behavior: smooth; 
-      scroll-padding-top: var(--header-h); /* Impede que o header cubra as âncoras */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; scroll-padding-top: var(--header-h); }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
     }
-    
-    body { background: var(--bg); color: var(--text-main); line-height: 1.6; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+      /* Grade de papel milimetrado sutil, remete a prancheta de desenho */
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 48px 48px;
+      background-position: -1px -1px;
+    }
+
+    body.lock-scroll { overflow: hidden; }
+
+    a { color: inherit; }
+
+    a:focus-visible,
+    button:focus-visible,
+    [tabindex]:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 1px;
+    }
+
+    .skip-link {
+      position: absolute; top: -100%; left: 1rem;
+      background: var(--ink); color: var(--paper);
+      padding: 0.75rem 1.25rem; z-index: 1200;
+      transition: top 0.2s var(--ease);
+      text-decoration: none; font-family: var(--font-mono); font-size: 0.85rem;
+    }
+    .skip-link:focus { top: 1rem; }
+
+    /* Marcas de registro fixas nos cantos - convenção de impressão técnica */
+    .reg-mark {
+      position: fixed; width: 18px; height: 18px;
+      pointer-events: none; z-index: 150; opacity: 0.35;
+    }
+    .reg-mark::before, .reg-mark::after { content: ''; position: absolute; background: var(--ink); }
+    .reg-mark::before { top: 50%; left: 0; width: 100%; height: 1px; transform: translateY(-50%); }
+    .reg-mark::after { left: 50%; top: 0; height: 100%; width: 1px; transform: translateX(-50%); }
+    .reg-mark.tl { top: 14px; left: 14px; }
+    .reg-mark.tr { top: 14px; right: 14px; }
+    .reg-mark.bl { bottom: 14px; left: 14px; }
+    .reg-mark.br { bottom: 14px; right: 14px; }
+    @media (max-width: 640px) { .reg-mark { display: none; } }
+
+    /* Barra de progresso de scroll — a "régua" da página */
+    #scroll-ruler {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: var(--accent);
+      width: 0%; z-index: 250;
+      transition: width 0.1s linear;
+    }
+
+    /* Rótulo tipo etiqueta técnica (monoespaçado, versalete) */
+    .label-tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .label-tag::before { content: ''; width: 18px; height: 1px; background: var(--accent); display: inline-block; }
 
     /* =========================================
-       2. NAVEGAÇÃO (HEADER FIXO)
+       2. NAVEGAÇÃO
        ========================================= */
     header {
-      position: fixed;
-      top: 0; left: 0; width: 100%;
+      position: fixed; top: 0; left: 0; width: 100%;
       height: var(--header-h);
-      background: rgba(250, 250, 250, 0.95);
-      backdrop-filter: blur(5px);
+      background: rgba(245, 243, 238, 0.9);
+      backdrop-filter: blur(6px);
       display: flex; justify-content: space-between; align-items: center;
-      padding: 0 5%;
-      border-bottom: 1px solid var(--accent);
-      z-index: 100;
+      padding: 0 var(--section-pad-x);
+      border-bottom: 1px solid var(--line-strong);
+      z-index: 200;
     }
-    
-    .logo { font-size: 1.1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; }
-    
-    nav { display: flex; gap: 2rem; }
-    nav a { text-decoration: none; color: var(--text-main); font-size: 0.9rem; transition: opacity 0.2s; }
-    nav a:hover { opacity: 0.5; }
+
+    .logo {
+      font-family: var(--font-name);
+      font-style: italic;
+      font-weight: 500;
+      font-size: 1.3rem;
+      letter-spacing: 0.01em;
+    }
+    .logo span { color: var(--accent); }
+
+    .header-right { display: flex; align-items: center; gap: 1.75rem; }
+
+    nav.main-nav { display: flex; gap: 2rem; }
+    nav.main-nav a {
+      position: relative;
+      text-decoration: none; color: var(--ink);
+      font-family: var(--font-mono);
+      font-size: 0.8rem; letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.25rem 0;
+      transition: color 0.2s var(--ease);
+    }
+    nav.main-nav a::after {
+      content: ''; position: absolute; left: 0; bottom: -3px;
+      width: 100%; height: 1px; background: var(--accent);
+      transform: scaleX(0); transform-origin: right;
+      transition: transform 0.3s var(--ease);
+    }
+    nav.main-nav a:hover, nav.main-nav a:focus-visible { color: var(--accent); }
+    nav.main-nav a:hover::after, nav.main-nav a:focus-visible::after { transform: scaleX(1); transform-origin: left; }
+
+    .icon-link {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px;
+      color: var(--ink);
+      transition: color 0.2s var(--ease), transform 0.2s var(--ease);
+    }
+    .icon-link:hover, .icon-link:focus-visible { color: var(--accent); transform: translateY(-1px); }
+    .icon-link svg { width: 19px; height: 19px; }
+
+    .hamburger {
+      display: none; position: relative; width: 30px; height: 22px;
+      background: none; border: none; cursor: pointer; z-index: 210;
+    }
+    .hamburger span {
+      position: absolute; left: 0; width: 100%; height: 2px; background: var(--ink);
+      transition: transform 0.3s var(--ease), opacity 0.2s var(--ease), top 0.3s var(--ease);
+    }
+    .hamburger span:nth-child(1) { top: 0; }
+    .hamburger span:nth-child(2) { top: 10px; }
+    .hamburger span:nth-child(3) { top: 20px; }
+    .hamburger[aria-expanded="true"] span:nth-child(1) { top: 10px; transform: rotate(45deg); background: var(--accent); }
+    .hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+    .hamburger[aria-expanded="true"] span:nth-child(3) { top: 10px; transform: rotate(-45deg); background: var(--accent); }
+
+    .mobile-nav {
+      position: fixed; top: 0; right: 0; width: min(80vw, 340px); height: 100vh;
+      background: var(--paper);
+      border-left: 1px solid var(--line-strong);
+      display: flex; flex-direction: column;
+      padding: calc(var(--header-h) + 2rem) 2rem 2rem;
+      gap: 1.5rem;
+      transform: translateX(100%);
+      transition: transform 0.35s var(--ease);
+      z-index: 190;
+    }
+    .mobile-nav.open { transform: translateX(0); }
+    .mobile-nav a {
+      text-decoration: none; color: var(--ink);
+      font-family: var(--font-display); font-size: 1.5rem; font-weight: 400;
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.35s var(--ease), transform 0.35s var(--ease), color 0.2s var(--ease);
+    }
+    .mobile-nav a:hover { color: var(--accent); }
+    .mobile-nav.open a { opacity: 1; transform: translateY(0); }
+    .mobile-nav.open a:nth-child(1) { transition-delay: .08s; }
+    .mobile-nav.open a:nth-child(2) { transition-delay: .14s; }
+    .mobile-nav.open a:nth-child(3) { transition-delay: .2s; }
+    .mobile-nav.open a:nth-child(4) { transition-delay: .26s; }
+    .mobile-nav .mobile-social {
+      margin-top: auto; padding-top: 1.5rem; border-top: 1px solid var(--line);
+      font-family: var(--font-mono); font-size: 0.8rem;
+      opacity: 0; transition: opacity 0.35s var(--ease) 0.3s;
+    }
+    .mobile-nav.open .mobile-social { opacity: 1; }
+
+    .nav-overlay {
+      position: fixed; inset: 0; background: rgba(15, 35, 94, 0.15);
+      opacity: 0; pointer-events: none; transition: opacity 0.3s var(--ease); z-index: 180;
+    }
+    .nav-overlay.visible { opacity: 1; pointer-events: auto; }
 
     /* =========================================
-       3. ESTRUTURA DAS SEÇÕES
+       3. ESTRUTURA / SEÇÕES
        ========================================= */
-    section { padding: 6rem 5%; min-height: 80vh; display: flex; flex-direction: column; justify-content: center; }
-    .section-title { font-size: 2rem; font-weight: 300; margin-bottom: 3rem; text-transform: uppercase; letter-spacing: 1px; }
+    section {
+      padding: var(--section-pad-y) var(--section-pad-x);
+      min-height: 80vh; display: flex; flex-direction: column; justify-content: center;
+      position: relative;
+    }
 
-    /* --- Seção Início --- */
-    #inicio { align-items: center; text-align: center; background: var(--bg); }
-    #inicio h1 { font-size: 4rem; font-weight: 300; line-height: 1.1; margin-bottom: 1rem; }
-    #inicio p { font-size: 1.2rem; color: var(--text-muted); max-width: 600px; }
+    .section-head { margin-bottom: clamp(2.5rem, 1.8rem + 2vw, 4rem); }
+    .section-head .label-tag { margin-bottom: 1rem; }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: var(--fs-h2); font-weight: 500;
+      letter-spacing: -0.01em;
+    }
 
-    /* --- Seção Sobre --- */
-    #sobre { background: var(--bg-alt); }
-    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-    .about-img { width: 100%; aspect-ratio: 3/4; background: var(--accent); object-fit: cover; }
-    .about-text p { margin-bottom: 1.5rem; font-size: 1.1rem; }
-    .skills { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2rem; }
-    .skill-tag { padding: 0.5rem 1rem; border: 1px solid var(--text-muted); font-size: 0.85rem; text-transform: uppercase; }
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+    .gallery .reveal:nth-child(2) { transition-delay: .08s; }
+    .gallery .reveal:nth-child(3) { transition-delay: .16s; }
+    .gallery .reveal:nth-child(4) { transition-delay: .24s; }
+    .gallery .reveal:nth-child(5) { transition-delay: .32s; }
 
-    /* --- Seção Trabalhos (Reaproveitando grid anterior) --- */
-    #trabalhos { background: var(--bg); }
-    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2.5rem; }
-    .card { cursor: pointer; }
-    .card-img-wrapper { width: 100%; aspect-ratio: 4/5; overflow: hidden; background: var(--accent); position: relative; }
-    .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
-    .card:hover .card-img-wrapper img { transform: scale(1.03); }
-    .card-info { padding: 1.2rem 0; display: flex; justify-content: space-between; align-items: flex-start; }
-    .card-title { font-size: 1.1rem; font-weight: 500; }
-    .card-category { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.3rem; }
-    .btn-pdf { font-size: 0.75rem; padding: 0.4rem 0.8rem; border: 1px solid var(--text-main); color: var(--text-main); text-decoration: none; text-transform: uppercase; transition: all 0.2s; }
-    .btn-pdf:hover { background: var(--text-main); color: var(--bg); }
+    /* --- Hero --- */
+    #inicio { align-items: flex-start; text-align: left; padding-top: calc(var(--header-h) + 3rem); }
+    .hero-coords { margin-bottom: 1.5rem; }
+    #inicio h1 {
+      font-family: var(--font-display); font-size: var(--fs-hero);
+      font-weight: 500; line-height: 0.98; letter-spacing: -0.02em;
+      margin-bottom: 1.75rem; max-width: 14ch;
+    }
+    #inicio h1 em { font-style: normal; color: var(--accent); }
+    #inicio p { font-size: var(--fs-body); color: var(--ink-soft); max-width: 46ch; margin-bottom: 2.5rem; }
 
-    /* --- Seção Contato --- */
-    #contato { background: var(--text-main); color: var(--bg); min-height: 50vh; text-align: center; }
-    #contato .section-title { margin-bottom: 1.5rem; }
-    .contact-info { font-size: 1.5rem; font-weight: 300; margin-bottom: 3rem; }
-    .social-links { display: flex; justify-content: center; gap: 2rem; }
-    .social-links a { color: var(--bg); text-decoration: none; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
-    .social-links a:hover { border-color: var(--bg); }
+    .hero-meta {
+      display: flex; flex-wrap: wrap; gap: clamp(1.5rem, 1rem + 2vw, 3rem);
+      width: 100%; max-width: 720px;
+    }
+    .hero-meta div { display: flex; flex-direction: column; gap: 0.35rem; }
+    .hero-meta .k { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+    .hero-meta .v { font-family: var(--font-body); font-size: 0.95rem; }
+
+    /* --- Sobre --- */
+    #sobre { background: var(--paper-alt); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: minmax(180px, 260px) 1fr;
+      gap: clamp(2.5rem, 1.5rem + 3vw, 5rem);
+      align-items: start;
+    }
+    .about-img-frame {
+      position: relative;
+      justify-self: start;
+    }
+    .about-img-frame .about-img {
+      width: 100%; aspect-ratio: 4/5; background: var(--line); object-fit: cover; display: block;
+      filter: grayscale(20%) contrast(1.02);
+    }
+    .about-img-frame .scale-badge {
+      position: absolute; bottom: 0.6rem; right: 0.6rem;
+      background: rgba(245,243,238,0.92); border: 1px solid var(--ink);
+      font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.05em;
+      padding: 0.35rem 0.6rem;
+    }
+    .about-img-frame .fig-caption {
+      display: block; margin-top: 0.6rem;
+      font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.05em;
+      color: var(--ink-soft); text-transform: uppercase;
+    }
+    .about-text { padding-top: 0.25rem; }
+    .about-text p { margin-bottom: 1.5rem; font-size: var(--fs-body); }
+    .about-text p:first-child { font-family: var(--font-display); font-size: 1.35rem; font-weight: 400; color: var(--ink); }
+    .name-serif { font-family: var(--font-name); font-style: italic; font-weight: 500; }
+
+    .skills { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+    .skill-tag {
+      padding: 0.5rem 0.9rem; border: 1px solid var(--ink);
+      font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.03em; text-transform: uppercase;
+      transition: background 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
+    }
+    .skill-tag:hover { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+
+    .btn-line {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.03em; text-transform: uppercase;
+      text-decoration: none; color: var(--ink);
+      padding: 0.85rem 1.4rem; border: 1px solid var(--ink);
+      transition: background 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.15s var(--ease);
+    }
+    .btn-line:hover { background: var(--ink); color: var(--paper); }
+    .btn-line:active { transform: scale(0.98); }
+    .btn-line svg { width: 14px; height: 14px; transition: transform 0.2s var(--ease); }
+    .btn-line:hover svg { transform: translate(2px, -2px); }
+
+    /* --- Trabalhos --- */
+    #trabalhos { background: var(--paper); }
+    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: var(--gap-grid); }
+
+    .card {
+      display: flex; flex-direction: column;
+      border: 1px solid var(--line-strong);
+      background: var(--paper);
+      transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+    }
+    .card:hover, .card:focus-within { border-color: var(--accent); box-shadow: 4px 4px 0 var(--accent); }
+
+    .card-img-wrapper { width: 100%; aspect-ratio: 4/5; overflow: hidden; background: var(--line); position: relative; border-bottom: 1px solid var(--line-strong); }
+    .card-img-btn { display: block; width: 100%; height: 100%; border: none; padding: 0; margin: 0; cursor: pointer; background: none; }
+    .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s var(--ease); display: block; filter: grayscale(10%); }
+    .card-img-btn:hover img, .card-img-btn:focus-visible img { transform: scale(1.04); filter: grayscale(0%); }
+
+    .card-info { padding: 1.4rem 1.4rem 0; display: flex; flex-direction: column; flex-grow: 1; }
+    .card-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 500; margin-bottom: 0.5rem; }
+    .card-desc { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 1.5rem; flex-grow: 1; }
+
+    /* Rodapé estilo "carimbo de prancha" */
+    .card-stamp {
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid var(--line-strong);
+      padding: 0.85rem 1.4rem; margin-top: auto;
+      font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+    .card-stamp .card-num { color: var(--accent); font-weight: 500; }
+    .card-stamp .btn-pdf {
+      font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.03em; text-transform: uppercase;
+      text-decoration: none; color: var(--ink);
+      border-bottom: 1px solid var(--ink);
+      transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+    }
+    .card-stamp .btn-pdf:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* --- Contato --- */
+    #contato { background: var(--ink-deep); color: var(--paper); min-height: 60vh; }
+    #contato .label-tag { color: #CFD2D6; }
+    #contato .label-tag::before { background: #CFD2D6; }
+    #contato .section-title { color: var(--paper); }
+
+    .contact-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(2rem, 1.5rem + 2vw, 4rem); align-items: end; }
+    #contato h2.big-cta {
+      font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em;
+      font-size: clamp(1.8rem, 1.4rem + 2.5vw, 3rem); line-height: 1.15; max-width: 16ch;
+    }
+
+    .contact-directory { display: flex; flex-direction: column; }
+    .directory-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.1rem 0; border-bottom: 1px solid rgba(245,243,238,0.2);
+      text-decoration: none; color: var(--paper);
+      font-family: var(--font-mono); font-size: 0.9rem;
+      transition: padding-left 0.2s var(--ease), color 0.2s var(--ease);
+    }
+    .directory-item:first-child { border-top: 1px solid rgba(245,243,238,0.2); }
+    .directory-item:hover, .directory-item:focus-visible { padding-left: 0.6rem; color: #CFD2D6; }
+    .directory-item .di-label { color: rgba(245,243,238,0.55); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .directory-item svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .directory-item .di-main { display: flex; align-items: center; gap: 0.6rem; }
+
+    .footnote { margin-top: 3rem; font-family: var(--font-mono); font-size: 0.7rem; color: rgba(245,243,238,0.4); letter-spacing: 0.04em; }
 
     /* =========================================
-       4. MODAL / LIGHTBOX
+       4. LIGHTBOX
        ========================================= */
     #lightbox {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(255,255,255,0.98); display: flex; justify-content: center; align-items: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 1000;
+      position: fixed; inset: 0; background: rgba(20, 22, 26, 0.96);
+      display: flex; justify-content: center; align-items: center; padding: 2rem;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s var(--ease); z-index: 1000;
     }
     #lightbox.active { opacity: 1; pointer-events: auto; }
-    #lightbox img { max-width: 90%; max-height: 90vh; object-fit: contain; box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
-    .close-btn { position: absolute; top: 2rem; right: 2rem; font-size: 2.5rem; cursor: pointer; color: var(--text-main); background: none; border: none; font-weight: 300; }
-    
-    /* Responsividade Básica */
-    @media (max-width: 768px) {
-      .about-grid { grid-template-columns: 1fr; }
-      #inicio h1 { font-size: 2.5rem; }
-      nav { display: none; /* Em dev: Aqui entraria um menu hamburguer depois */ }
+    #lightbox img {
+      max-width: 100%; max-height: 82vh; object-fit: contain;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      transform: scale(0.92); transition: transform 0.35s var(--ease);
+      border: 1px solid rgba(245,243,238,0.2);
     }
+    #lightbox.active img { transform: scale(1); }
+    #lightbox .lightbox-caption {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      font-family: var(--font-mono); font-size: 0.75rem; color: rgba(245,243,238,0.6);
+      letter-spacing: 0.05em; text-align: center; max-width: 90%;
+    }
+    .close-btn {
+      position: absolute; top: 1.25rem; right: clamp(1rem, 0.5rem + 2vw, 2rem);
+      font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.05em;
+      cursor: pointer; color: var(--paper); background: none;
+      border: 1px solid rgba(245,243,238,0.35); padding: 0.5rem 0.9rem;
+      transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
+    }
+    .close-btn:hover { border-color: var(--paper); color: #CFD2D6; }
+
+    /* Responsividade */
+    @media (max-width: 860px) {
+      .about-grid, .contact-grid { grid-template-columns: 1fr; }
+      .contact-grid { align-items: start; }
+      .about-img-frame { max-width: 240px; justify-self: start; }
+    }
+    @media (max-width: 768px) {
+      nav.main-nav { display: none; }
+      .hamburger { display: block; }
+      #inicio { padding-top: calc(var(--header-h) + 2rem); }
+    }
+    @media (min-width: 769px) { .mobile-nav, .nav-overlay { display: none; } }
   </style>
 </head>
 <body>
 
+  <div id="scroll-ruler"></div>
+  <span class="reg-mark tl" aria-hidden="true"></span>
+  <span class="reg-mark tr" aria-hidden="true"></span>
+  <span class="reg-mark bl" aria-hidden="true"></span>
+  <span class="reg-mark br" aria-hidden="true"></span>
+
+  <a class="skip-link" href="#inicio">Pular para o conteúdo</a>
+
   <!-- Navegação -->
   <header>
-    <div class="logo">Nome da Irmã</div>
-    <nav>
-      <a href="#inicio">Início</a>
-      <a href="#sobre">Sobre</a>
-      <a href="#trabalhos">Projetos</a>
-      <a href="#contato">Contato</a>
-    </nav>
+    <div class="logo">Brida <span>Monte</span></div>
+
+    <div class="header-right">
+      <nav class="main-nav" aria-label="Navegação principal">
+        <a href="#inicio">Início</a>
+        <a href="#sobre">Sobre</a>
+        <a href="#trabalhos">Projetos</a>
+        <a href="#contato">Contato</a>
+      </nav>
+
+      <a class="icon-link" href="https://instagram.com/bridamontee" target="_blank" rel="noopener" aria-label="Abrir perfil do Instagram (nova aba)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="5"/>
+          <circle cx="12" cy="12" r="4.2"/>
+          <circle cx="17.4" cy="6.6" r="0.9" fill="currentColor" stroke="none"/>
+        </svg>
+      </a>
+
+      <a class="icon-link" href="https://www.linkedin.com/in/brida-monte-84324a40a/" target="_blank" rel="noopener" aria-label="Abrir perfil do LinkedIn (nova aba)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="3"/>
+          <line x1="7.5" y1="10" x2="7.5" y2="16.5"/>
+          <circle cx="7.5" cy="7" r="0.6" fill="currentColor" stroke="none"/>
+          <path d="M11 16.5v-4c0-1.4 1-2.5 2.4-2.5S15.8 11.1 15.8 12.5v4" stroke-linecap="round"/>
+        </svg>
+      </a>
+
+      <button class="hamburger" id="hamburger-btn" aria-expanded="false" aria-controls="mobile-nav" aria-label="Abrir menu de navegação">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </header>
 
-  <!-- Hero Section -->
+  <div class="nav-overlay" id="nav-overlay"></div>
+
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Navegação mobile">
+    <a href="#inicio">Início</a>
+    <a href="#sobre">Sobre</a>
+    <a href="#trabalhos">Projetos</a>
+    <a href="#contato">Contato</a>
+    <div class="mobile-social">
+      <a class="icon-link" style="width:auto; gap:0.5rem; margin-bottom:0.75rem;" href="https://instagram.com/bridamonte.arq" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="0.9" fill="currentColor" stroke="none"/>
+        </svg>
+        @bridamonte.arq
+      </a>
+      <a class="icon-link" style="width:auto; gap:0.5rem;" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="3"/>
+          <line x1="7.5" y1="10" x2="7.5" y2="16.5"/>
+          <circle cx="7.5" cy="7" r="0.6" fill="currentColor" stroke="none"/>
+          <path d="M11 16.5v-4c0-1.4 1-2.5 2.4-2.5S15.8 11.1 15.8 12.5v4" stroke-linecap="round"/>
+        </svg>
+        /in/bridamonte
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
   <section id="inicio">
-    <h1>Arquitetura<br>& Urbanismo</h1>
-    <p>Criando espaços que conectam pessoas, funcionalidade e estética. Portfólio de projetos acadêmicos e profissionais.</p>
+    <span class="label-tag reveal hero-coords">N 07°06' S · W 34°52' O — JOÃO PESSOA, PB</span>
+    <h1 class="reveal">Arquitetura<br>&amp; <em>Urbanismo</em></h1>
+    <p class="reveal">Espaços desenhados na interseção entre função, técnica e sensibilidade. Portfólio de projetos acadêmicos em desenvolvimento.</p>
+
+    <div class="hero-meta reveal">
+      <div><span class="k">Formação</span><span class="v">Arquitetura e Urbanismo — UNIESP</span></div>
+      <div><span class="k">Período</span><span class="v">3º Período</span></div>
+      <div><span class="k">Ferramentas</span><span class="v">Revit · SketchUp · AutoCAD</span></div>
+      <div><span class="k">Disponibilidade</span><span class="v">Aberta a estágio</span></div>
+    </div>
   </section>
 
-  <!-- Sobre Mim -->
+  <!-- Sobre -->
   <section id="sobre">
-    <h2 class="section-title">Sobre Mim</h2>
+    <div class="section-head reveal">
+      <span class="label-tag">Prancha 01 — Perfil</span>
+      <h2 class="section-title">Sobre Mim</h2>
+    </div>
     <div class="about-grid">
-      <!-- Troque o src por uma foto da sua irmã -->
-      <img class="about-img" src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Foto de Perfil">
-      <div class="about-text">
-        <p>Olá, sou a [Nome]. Estudante do Xº semestre de Arquitetura e Urbanismo pela [Universidade].</p>
-        <p>Acredito que a arquitetura não é apenas sobre erguer paredes, mas sobre desenhar a forma como as pessoas experienciam o mundo ao seu redor. Tenho forte interesse em design de interiores, urbanismo tático e sustentabilidade.</p>
+      <div class="about-img-frame reveal">
+        <img class="about-img" src="photo.jpeg" alt="Foto de Brida Monte">
+        <span class="scale-badge">ESC. 1:20</span>
+        <span class="fig-caption">Fig. 01 — Brida Monte</span>
+      </div>
+      <div class="about-text reveal">
+        <p>Olá, sou <span class="name-serif">Brida Monte</span>, estudante do 3º período de Arquitetura e Urbanismo pela UNIESP, em João Pessoa - PB.</p>
+        <p>Tenho vivência prática em rotinas administrativas, o que desenvolveu minha capacidade de organização de projetos, elaboração de relatórios e análise de custos. Atualmente, busco uma oportunidade de estágio em arquitetura para aplicar na prática meus conhecimentos técnicos e crescer junto com o mercado.</p>
+
         <div class="skills">
-          <span class="skill-tag">AutoCAD</span>
-          <span class="skill-tag">SketchUp</span>
           <span class="skill-tag">Revit</span>
-          <span class="skill-tag">Lumion</span>
-          <span class="skill-tag">Photoshop</span>
+          <span class="skill-tag">SketchUp</span>
+          <span class="skill-tag">AutoCAD</span>
+          <span class="skill-tag">Leitura de Plantas</span>
+          <span class="skill-tag">Urbanismo Tático</span>
+        </div>
+
+        <div style="margin-top: 2.5rem;">
+          <a href="https://drive.google.com/file/d/1y8BS-uhhUirc1J2ISHm59KpEC4HMBalR/view?usp=drive_link" target="_blank" rel="noopener" class="btn-line">
+            Acessar Currículo Completo
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Projetos (Renderizados via JS) -->
+  <!-- Projetos -->
   <section id="trabalhos">
-    <h2 class="section-title">Trabalhos Selecionados</h2>
+    <div class="section-head reveal">
+      <span class="label-tag">Prancha 02 — Acervo</span>
+      <h2 class="section-title">Trabalhos Selecionados</h2>
+    </div>
     <div class="gallery" id="portfolio-grid"></div>
   </section>
 
   <!-- Contato -->
   <section id="contato">
-    <h2 class="section-title">Vamos conversar?</h2>
-    <div class="contact-info">
-      <p>email.da.irma@gmail.com</p>
-      <p>+55 (00) 90000-0000</p>
+    <div class="section-head reveal">
+      <span class="label-tag">Prancha 03 — Contato</span>
     </div>
-    <div class="social-links">
-      <a href="#" target="_blank">LinkedIn</a>
-      <a href="#" target="_blank">Behance</a>
-      <a href="#" target="_blank">Instagram</a>
+    <div class="contact-grid">
+      <h2 class="big-cta reveal">Vamos conversar sobre o próximo projeto?</h2>
+
+      <div class="contact-directory reveal">
+        <a class="directory-item" href="mailto:bridasofiagdomonte@gmail.com">
+          <span class="di-main"><span class="di-label">E-mail</span></span>
+          <span>bridasofiagdomonte@gmail.com</span>
+        </a>
+        <a class="directory-item" href="tel:+5583998378827">
+          <span class="di-main"><span class="di-label">Telefone</span></span>
+          <span>(83) 99837-8827</span>
+        </a>
+        <a class="directory-item" href="https://instagram.com/bridamontee" target="_blank" rel="noopener">
+          <span class="di-main"><span class="di-label">Instagram</span></span>
+          <span>@bridamontee</span>
+        </a>
+        <a class="directory-item" href="https://www.linkedin.com/in/brida-monte-84324a40a/" target="_blank" rel="noopener">
+          <span class="di-main"><span class="di-label">LinkedIn</span></span>
+          <span>/in/bridamonte</span>
+        </a>
+      </div>
     </div>
+    <p class="footnote">JOÃO PESSOA, PARAÍBA — BRASIL</p>
   </section>
 
-  <!-- Lightbox Modal -->
-  <div id="lightbox">
-    <button class="close-btn" onclick="closeModal()">&times;</button>
-    <img id="lightbox-img" src="" alt="Imagem Ampliada">
+  <!-- Lightbox -->
+  <div id="lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Imagem ampliada do projeto">
+    <button class="close-btn" id="close-btn" aria-label="Fechar imagem ampliada">FECHAR ✕</button>
+    <img id="lightbox-img" src="" alt="">
+    <p class="lightbox-caption" id="lightbox-caption"></p>
   </div>
 
   <script>
     /* =========================================
-       DADOS MOCKADOS E RENDER (MESMA LÓGICA)
+       DADOS DOS PROJETOS
        ========================================= */
     const projects = [
       {
         id: 1,
-        title: "Casa Angular",
-        category: "Projeto Residencial • 2025",
-        thumbnail: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        pdfLink: "docs/projeto1.pdf"
+        title: "Intervenção Urbana e Trânsito Universitário",
+        category: "Urbanismo Tático",
+        description: "Proposta de urbanismo tático focada na otimização e melhoria do tráfego no campus. O projeto utiliza o mapeamento por cores como estratégia principal de intervenção e teve todo o seu desenvolvimento técnico realizado em AutoCAD.",
+        thumbnail: "intervencao.jpeg",
+        pdfLink: "https://drive.google.com/file/d/11RUveVbsSoyNX-oQ3f4ZZOOO5w1hqoj8/view?usp=drive_link"
       },
       {
         id: 2,
-        title: "Museu da Luz",
-        category: "Equipamento Urbano • 2024",
-        thumbnail: "https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        pdfLink: null
+        title: "Projeto Luminotécnico Residencial",
+        category: "Conforto Lumínico",
+        description: "Planta de iluminação de um apartamento desenvolvida em equipe. O escopo do trabalho envolveu a realização de cálculos luminotécnicos precisos e a especificação detalhada de todos os pontos de luz a partir de uma planta base.",
+        thumbnail: "corredor.png",
+        pdfLink: "https://drive.google.com/file/d/1umVnuUSx40p8CipNITW8La6Ed9akq9XN/view?usp=drive_link"
       },
       {
         id: 3,
-        title: "Reforma Apto 302",
-        category: "Interiores • 2023",
-        thumbnail: "https://images.unsplash.com/photo-1600607687920-4e2a09be1587?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        pdfLink: "docs/projeto3.pdf"
+        title: "Arquitetura de Interiores Temática: Zootopia",
+        category: "Design de Interiores",
+        description: "Projeto colaborativo de interiores onde o planejamento do apartamento foi setorizado entre a equipe. Fui responsável pela planta de gesso e paginação de piso, além de todo o detalhamento técnico de marcenaria e pedras da cozinha e área de serviço.",
+        thumbnail: "interioresphoto.jpeg",
+        pdfLink: "https://drive.google.com/file/d/1kLZ60nMLdBf-tsyCoQC8j48rNRcIexhA/view?usp=drive_link"
+      },
+      {
+        id: 4,
+        title: "Modelagem Arquitetônica: Transição para o Revit",
+        category: "Modelagem BIM",
+        description: "Migração de um edifício residencial de três pavimentos do AutoCAD para o Revit. O foco do trabalho foi a introdução à modelagem e a aplicação prática dos fundamentos do novo software.",
+        thumbnail: "predio.jpg",
+        pdfLink: "https://drive.google.com/file/d/11sJsi69MiFCiKfpbongRjWKWFycmQU03/view?usp=drive_link"
+      },
+      {
+        id: 5,
+        title: "Intervenção e Acessibilidade: Banheiro Universitário",
+        category: "Acessibilidade",
+        description: "Proposta de reforma para um banheiro feminino do campus com foco na adequação de acessibilidade. Englobou o levantamento métrico, nova planta baixa acessível em AutoCAD e a modelagem 3D no SketchUp.",
+        thumbnail: "banheiro.png",
+        pdfLink: "https://drive.google.com/file/d/12JrD6qb3IRt5PkaxvSIQWa3l28Q072DL/view?usp=drive_link"
       }
     ];
 
+    /* =========================================
+       RENDERIZAÇÃO DA GALERIA
+       Cards com rodapé estilo "carimbo de prancha técnica"
+       ========================================= */
     const grid = document.getElementById('portfolio-grid');
 
     function renderProjects() {
-      grid.innerHTML = projects.map(proj => `
-        <div class="card">
-          <div class="card-img-wrapper" onclick="openModal('${proj.thumbnail}')">
-            <img src="${proj.thumbnail}" alt="${proj.title}" loading="lazy">
+      grid.innerHTML = projects.map((proj, i) => `
+        <article class="card reveal">
+          <div class="card-img-wrapper">
+            <button class="card-img-btn" data-img="${proj.thumbnail}" data-title="${proj.title}" aria-label="Ampliar imagem do projeto: ${proj.title}">
+              <img src="${proj.thumbnail}" alt="${proj.title}" loading="lazy">
+            </button>
           </div>
           <div class="card-info">
-            <div>
-              <h3 class="card-title">${proj.title}</h3>
-              <p class="card-category">${proj.category}</p>
-            </div>
-            ${proj.pdfLink ? `<a href="${proj.pdfLink}" target="_blank" class="btn-pdf">PDF</a>` : ''}
+            <h3 class="card-title">${proj.title}</h3>
+            <p class="card-desc">${proj.description}</p>
           </div>
-        </div>
+          <div class="card-stamp">
+            <span><span class="card-num">Nº ${String(i + 1).padStart(2, '0')}</span> · ${proj.category}</span>
+            ${proj.pdfLink ? `<a href="${proj.pdfLink}" target="_blank" rel="noopener" class="btn-pdf">Abrir ↗</a>` : ''}
+          </div>
+        </article>
       `).join('');
+
+      grid.querySelectorAll('.card-img-btn').forEach(btn => {
+        btn.addEventListener('click', () => openModal(btn.dataset.img, btn.dataset.title, btn));
+      });
+
+      grid.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     }
 
-    /* Modal / Lightbox Lógica */
+    /* =========================================
+       REVEAL ON SCROLL
+       ========================================= */
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    /* =========================================
+       BARRA DE PROGRESSO DE SCROLL ("régua")
+       ========================================= */
+    const ruler = document.getElementById('scroll-ruler');
+    function updateRuler() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      ruler.style.width = pct + '%';
+    }
+    window.addEventListener('scroll', updateRuler, { passive: true });
+    updateRuler();
+
+    /* =========================================
+       FOCUS TRAP reutilizável
+       ========================================= */
+    function createFocusTrap(container) {
+      const focusableSelector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+      function handleKeydown(e) {
+        if (e.key !== 'Tab') return;
+        const focusables = Array.from(container.querySelectorAll(focusableSelector))
+          .filter(el => el.offsetParent !== null);
+        if (focusables.length === 0) return;
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault(); last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault(); first.focus();
+        }
+      }
+
+      return {
+        activate() { container.addEventListener('keydown', handleKeydown); },
+        deactivate() { container.removeEventListener('keydown', handleKeydown); }
+      };
+    }
+
+    /* =========================================
+       MENU MOBILE
+       ========================================= */
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const mobileNav = document.getElementById('mobile-nav');
+    const navOverlay = document.getElementById('nav-overlay');
+    const mobileNavTrap = createFocusTrap(mobileNav);
+    let lastFocusedBeforeMenu = null;
+
+    function openMenu() {
+      lastFocusedBeforeMenu = document.activeElement;
+      mobileNav.classList.add('open');
+      navOverlay.classList.add('visible');
+      hamburgerBtn.setAttribute('aria-expanded', 'true');
+      hamburgerBtn.setAttribute('aria-label', 'Fechar menu de navegação');
+      document.body.classList.add('lock-scroll');
+      mobileNavTrap.activate();
+      mobileNav.querySelector('a')?.focus();
+    }
+
+    function closeMenu() {
+      mobileNav.classList.remove('open');
+      navOverlay.classList.remove('visible');
+      hamburgerBtn.setAttribute('aria-expanded', 'false');
+      hamburgerBtn.setAttribute('aria-label', 'Abrir menu de navegação');
+      document.body.classList.remove('lock-scroll');
+      mobileNavTrap.deactivate();
+      lastFocusedBeforeMenu?.focus();
+    }
+
+    hamburgerBtn.addEventListener('click', () => {
+      const isOpen = hamburgerBtn.getAttribute('aria-expanded') === 'true';
+      isOpen ? closeMenu() : openMenu();
+    });
+    navOverlay.addEventListener('click', closeMenu);
+    mobileNav.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileNav.classList.contains('open')) closeMenu();
+    });
+
+    /* =========================================
+       LIGHTBOX
+       ========================================= */
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const closeBtn = document.getElementById('close-btn');
+    const lightboxTrap = createFocusTrap(lightbox);
+    let lastFocusedBeforeModal = null;
 
-    function openModal(imgSrc) {
+    function openModal(imgSrc, imgAlt, triggerEl) {
+      lastFocusedBeforeModal = triggerEl || document.activeElement;
       lightboxImg.src = imgSrc;
+      lightboxImg.alt = imgAlt || 'Imagem ampliada do projeto';
+      lightboxCaption.textContent = imgAlt || '';
       lightbox.classList.add('active');
-      document.body.style.overflow = 'hidden';
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('lock-scroll');
+      lightboxTrap.activate();
+      closeBtn.focus();
     }
 
     function closeModal() {
       lightbox.classList.remove('active');
-      document.body.style.overflow = 'auto';
-      setTimeout(() => lightboxImg.src = '', 300);
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('lock-scroll');
+      lightboxTrap.deactivate();
+      setTimeout(() => { lightboxImg.src = ''; }, 300);
+      lastFocusedBeforeModal?.focus();
     }
 
-    lightbox.addEventListener('click', (e) => {
-      if (e.target === lightbox) closeModal();
-    });
-
+    closeBtn.addEventListener('click', closeModal);
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeModal(); });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && lightbox.classList.contains('active')) closeModal();
     });
 
-    // Inicia o render
+    // Inicializa
     renderProjects();
   </script>
 </body>
